@@ -1,37 +1,35 @@
-DROP PROCEDURE IF EXISTS API_InsertNewApplication;
-CREATE PROCEDURE API_InsertNewApplication(IN entity VARCHAR(255))
- BEGIN
-  DECLARE GEUUID VARCHAR(255);
-  DECLARE APPUUID VARCHAR(255);
-  DECLARE EFUNCUUID VARCHAR(255);
-  SELECT UUID() INTO GEUUID;
-  SELECT UUID() INTO APPUUID;
-  SELECT id FROM function WHERE `desc`="Student" INTO EFUNCUUID;
-  INSERT INTO groupentity (id,entity,function,createdin,createdby) VALUES (GEUUID,entity,EFUNCUUID,NOW(),entity);
-  INSERT INTO application VALUES (APPUUID,entity,NOW());
-  INSERT INTO applicationgroup VALUES (APPUUID,GEUUID,NOW(),entity);
-  SELECT APPUUID, GEUUID;
- END;
-
-DROP PROCEDURE IF EXISTS API_IsTeacher;
-CREATE PROCEDURE API_IsTeacher(IN entity VARCHAR(255))
+-- isAdmin --
+DROP PROCEDURE IF EXISTS isAdmin;
+DELIMITER $$
+CREATE PROCEDURE isAdmin(IN id INT)
 BEGIN
-  DECLARE TEACHER BOOLEAN;
-  SELECT EXISTS(SELECT * FROM teacher AS t where t.id=entity) INTO TEACHER;
-  SELECT TEACHER;
-END;
+	SELECT u.isadmin FROM user u WHERE u.id = id;
+END$$
+DELIMITER ;
 
-CREATE PROCEDURE API_IsStudent(IN entity VARCHAR(255))
-  BEGIN
-    DECLARE STUDENT BOOLEAN;
-    SELECT EXISTS(SELECT * FROM student AS s where s.id=entity) INTO STUDENT;
-    SELECT STUDENT;
-  END;
+-- isteacher --
+DROP PROCEDURE IF EXISTS isTeacher;
+DELIMITER $$
+CREATE PROCEDURE isTeacher(IN id INT)
+BEGIN
+	SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "teacher");
+END$$
+DELIMITER ;
 
-DROP PROCEDURE IF EXISTS IsInGroup;
-CREATE PROCEDURE IsInGroup(IN entityUUID VARCHAR(255), IN groupUUID VARCHAR(255))
-  BEGIN
-    DECLARE IS_IN_GROUP BOOLEAN;
-    SELECT EXISTS(SELECT * FROM groupentity ge WHERE ge.id=groupUUID AND ge.entity=entityUUID) INTO IS_IN_GROUP;
-    SELECT IS_IN_GROUP;
-  END;
+-- isStudent --
+DROP PROCEDURE IF EXISTS isStudent;
+DELIMITER $$
+CREATE PROCEDURE isStudent(IN id INT)
+BEGIN
+	SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "student");
+END$$
+DELIMITER ;
+
+-- isInGroup --
+DROP PROCEDURE IF EXISTS isInGroup;
+DELIMITER $$
+CREATE PROCEDURE isInGroup(IN userid INT, IN groupid INT)
+BEGIN
+	SELECT EXISTS(SELECT * FROM groupuser gu WHERE gu.userid = userid AND gu.groupid = groupid);
+END$$
+DELIMITER ;
