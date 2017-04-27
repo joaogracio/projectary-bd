@@ -104,3 +104,53 @@ BEGIN
 	END IF;
 END$$
 DELIMITER ;
+
+-- listCouses --
+DROP PROCEDURE IF EXISTS listCouses;
+DELIMITER $$
+CREATE PROCEDURE listCouses (IN schoolid INT)
+BEGIN
+	SELECT c.`desc` as 'course' FROM course c WHERE c.schoolid = schoolid;
+END$$
+DELIMITER ;
+
+-- listSchools --
+DROP PROCEDURE IF EXISTS listSchools;
+DELIMITER $$
+CREATE PROCEDURE listSchools ()
+BEGIN
+	SELECT s.`desc` as 'school' FROM school s;
+END$$
+DELIMITER ;
+
+-- listApplications --
+DROP PROCEDURE IF EXISTS listApplications;
+DELIMITER $$
+CREATE PROCEDURE listApplications (IN projectid INT, IN approved INT)
+BEGIN
+	CASE
+		WHEN approved = 0 THEN
+			IF (projectid > 0) THEN
+				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) = 0000;
+			ELSE
+				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) = 0000;
+			END IF;
+		WHEN approved = 1 THEN
+			IF (projectid > 0) THEN
+				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) != 0000;
+			ELSE
+				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) != 0000;
+			END IF;			
+	END CASE;
+END$$
+DELIMITER ;
+
+-- insertNewCourse --
+DROP PROCEDURE IF EXISTS insertNewCourse;
+DELIMITER $$
+CREATE PROCEDURE insertNewCourse (IN schoolid INT, IN description VARCHAR(255))
+BEGIN
+	INSERT INTO course (schoolid, `desc`)
+		VALUES (schoolid, description);
+END$$
+DELIMITER ;
