@@ -154,3 +154,43 @@ BEGIN
 		VALUES (schoolid, description);
 END$$
 DELIMITER ;
+
+-- insertNewType --
+DROP PROCEDURE IF EXISTS insertNewType;
+DELIMITER $$
+CREATE PROCEDURE insertNewType (IN description VARCHAR(255))
+BEGIN
+	INSERT INTO type (`desc`)
+		VALUES (description);
+END$$
+DELIMITER ;
+
+-- insertNewProject --
+DROP PROCEDURE IF EXISTS insertNewProject;
+DELIMITER $$
+CREATE PROCEDURE insertNewProject (IN schoolyear YEAR, IN courseid INT, IN name VARCHAR(255), IN description VARCHAR(255), IN userid INT)
+BEGIN
+	CALL isTeacher (userid, @teacher);
+    IF (@teacher = 1) THEN
+		INSERT INTO project (approvedin, year, courseid, name, description, userid, created)
+			VALUES (NOW(), schoolyear, courseid, name, description, userid, NOW());
+	ELSE
+		INSERT INTO project (year, courseid, name, description, userid, created)
+			VALUES (schoolyear, courseid, name, description, userid, NOW());
+	END IF;
+END$$
+DELIMITER ;
+
+-- listProjects --
+DROP PROCEDURE IF EXISTS listProjects;
+DELIMITER $$
+CREATE PROCEDURE listProjects (IN courseid INT, IN schoolyear YEAR, IN approved INT)
+BEGIN
+	CASE
+		WHEN approved = 0 THEN
+				SELECT * FROM project p WHERE p.courseid = courseid AND p.year = schoolyear AND YEAR(p.approvedin) IS NULL;
+		WHEN approved = 1 THEN
+				SELECT * FROM project p WHERE p.courseid = courseid AND p.year = schoolyear AND YEAR(p.approvedin) IS NOT NULL;
+	END CASE;
+END$$
+DELIMITER ;
