@@ -1,8 +1,3 @@
--- isAdmin --
-DROP PROCEDURE IF EXISTS isAdmin;
-DELIMITER $$
-
-<<<<<<< myProcs_3
 CREATE PROCEDURE isAdmin(IN id INT, OUT isAdmin BOOL)
 BEGIN
 	SET isAdmin = (SELECT u.isadmin FROM user u WHERE u.id = id);
@@ -109,38 +104,93 @@ BEGIN
 	END IF;
 END$$
 DELIMITER ;
-=======
-CREATE PROCEDURE isAdmin(IN id INT)
-BEGIN
-	SELECT u.isadmin FROM user u WHERE u.id = id;
-END$$
-DELIMITER ;
 
--- isteacher --
-DROP PROCEDURE IF EXISTS isTeacher;
+-- listCouses --
+DROP PROCEDURE IF EXISTS listCouses;
 DELIMITER $$
-CREATE PROCEDURE isTeacher(IN id INT)
+CREATE PROCEDURE listCouses (IN schoolid INT)
 BEGIN
-	SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "teacher");
+	SELECT c.`desc` as 'course' FROM course c WHERE c.schoolid = schoolid;
 END$$
 DELIMITER ;
 
--- isStudent --
-DROP PROCEDURE IF EXISTS isStudent;
+-- listSchools --
+DROP PROCEDURE IF EXISTS listSchools;
 DELIMITER $$
-CREATE PROCEDURE isStudent(IN id INT)
+CREATE PROCEDURE listSchools ()
 BEGIN
-	SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "student");
+	SELECT s.`desc` as 'school' FROM school s;
 END$$
 DELIMITER ;
 
--- isInGroup --
-DROP PROCEDURE IF EXISTS isInGroup;
+-- listApplications --
+DROP PROCEDURE IF EXISTS listApplications;
 DELIMITER $$
-CREATE PROCEDURE isInGroup(IN userid INT, IN groupid INT)
+CREATE PROCEDURE listApplications (IN projectid INT, IN approved INT)
 BEGIN
-	SELECT EXISTS(SELECT * FROM groupuser gu WHERE gu.userid = userid AND gu.groupid = groupid);
+	CASE
+		WHEN approved = 0 THEN
+			IF (projectid > 0) THEN
+				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) = 0000;
+			ELSE
+				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) = 0000;
+			END IF;
+		WHEN approved = 1 THEN
+			IF (projectid > 0) THEN
+				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) != 0000;
+			ELSE
+				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) != 0000;
+			END IF;			
+	END CASE;
 END$$
 DELIMITER ;
->>>>>>> master
 
+-- insertNewCourse --
+DROP PROCEDURE IF EXISTS insertNewCourse;
+DELIMITER $$
+CREATE PROCEDURE insertNewCourse (IN schoolid INT, IN description VARCHAR(255))
+BEGIN
+	INSERT INTO course (schoolid, `desc`)
+		VALUES (schoolid, description);
+END$$
+DELIMITER ;
+
+-- insertNewType --
+DROP PROCEDURE IF EXISTS insertNewType;
+DELIMITER $$
+CREATE PROCEDURE insertNewType (IN description VARCHAR(255))
+BEGIN
+	INSERT INTO type (`desc`)
+		VALUES (description);
+END$$
+DELIMITER ;
+
+-- insertNewProject --
+DROP PROCEDURE IF EXISTS insertNewProject;
+DELIMITER $$
+CREATE PROCEDURE insertNewProject (IN schoolyear YEAR, IN courseid INT, IN name VARCHAR(255), IN description VARCHAR(255), IN userid INT)
+BEGIN
+	CALL isTeacher (userid, @teacher);
+    IF (@teacher = 1) THEN
+		INSERT INTO project (approvedin, year, courseid, name, description, userid, created)
+			VALUES (NOW(), schoolyear, courseid, name, description, userid, NOW());
+	ELSE
+		INSERT INTO project (year, courseid, name, description, userid, created)
+			VALUES (schoolyear, courseid, name, description, userid, NOW());
+	END IF;
+END$$
+DELIMITER ;
+
+-- listProjects --
+DROP PROCEDURE IF EXISTS listProjects;
+DELIMITER $$
+CREATE PROCEDURE listProjects (IN courseid INT, IN schoolyear YEAR, IN approved INT)
+BEGIN
+	CASE
+		WHEN approved = 0 THEN
+				SELECT * FROM project p WHERE p.courseid = courseid AND p.year = schoolyear AND YEAR(p.approvedin) IS NULL;
+		WHEN approved = 1 THEN
+				SELECT * FROM project p WHERE p.courseid = courseid AND p.year = schoolyear AND YEAR(p.approvedin) IS NOT NULL;
+	END CASE;
+END$$
+DELIMITER ;
