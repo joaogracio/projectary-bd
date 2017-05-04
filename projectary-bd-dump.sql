@@ -98,6 +98,30 @@ INSERT INTO `course` VALUES (1,'Eng Informatica',1);
 UNLOCK TABLES;
 
 --
+-- Table structure for table `courseyear`
+--
+
+DROP TABLE IF EXISTS `courseyear`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `courseyear` (
+  `course` int(11) NOT NULL,
+  `year` year(4) NOT NULL,
+  `active` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`course`,`year`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `courseyear`
+--
+
+LOCK TABLES `courseyear` WRITE;
+/*!40000 ALTER TABLE `courseyear` DISABLE KEYS */;
+/*!40000 ALTER TABLE `courseyear` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `group`
 --
 
@@ -707,6 +731,25 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `InsertNewCourseYear` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertNewCourseYear`(IN course INT, IN year YEAR(4),IN active BOOLEAN)
+BEGIN
+ Insert INTO courseyear (course,year,active)VALUES (course,year,active);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `InsertNewUser` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -740,4 +783,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-04-21 22:37:00
+-- Dump completed on 2017-04-28 21:39:46
