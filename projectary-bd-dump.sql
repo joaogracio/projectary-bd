@@ -1,8 +1,8 @@
--- MySQL dump 10.16  Distrib 10.1.22-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.55, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: projectary-master
 -- ------------------------------------------------------
--- Server version	10.1.22-MariaDB-1~xenial
+-- Server version	5.5.55-0+deb8u1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -132,7 +132,8 @@ CREATE TABLE `group` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `desc` varchar(255) COLLATE utf8_bin NOT NULL,
   `password` varchar(255) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `group_desc_uindex` (`desc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -305,6 +306,30 @@ LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 INSERT INTO `user` VALUES (1,'Aluno testes','default_photo.png','1234',1,'1@ipt.pt','1234567789',0,'123qwe',0,0),(4,'Aluno testes','default_photo.png','12345',1,'2@ipt.pt','1234567789',0,'123qwe',0,0),(5,'Aluno testes','default_photo.png','123456',1,'3@ipt.pt','1234567789',0,'123qwe',0,0),(7,'Aluno testes','default_photo.png','12345678',1,'5@ipt.pt','1234567789',0,'123qwe',0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `userattribute`
+--
+
+DROP TABLE IF EXISTS `userattribute`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `userattribute` (
+  `userid` int(11) NOT NULL,
+  `attributeid` int(11) NOT NULL,
+  `value` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`userid`,`attributeid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `userattribute`
+--
+
+LOCK TABLES `userattribute` WRITE;
+/*!40000 ALTER TABLE `userattribute` DISABLE KEYS */;
+/*!40000 ALTER TABLE `userattribute` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -731,6 +756,25 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `DeleteUserAttribute` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `DeleteUserAttribute`(IN userid INT,IN attributeid INT,IN value VARCHAR(255))
+BEGIN
+    DELETE from userattribute where userattribute.userid=@userid and userattribute.attributeid=@attributeid;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `InsertNewCourseYear` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -773,6 +817,44 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `InsertUserAttribute` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `InsertUserAttribute`(IN userid INT,IN attributeid INT,IN value VARCHAR(255))
+BEGIN
+		INSERT INTO userattribute VALUES (userid,attributeid,value);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `UpdateUserAttribute` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `UpdateUserAttribute`(IN userid INT,IN attributeid INT,IN value VARCHAR(255))
+BEGIN
+    UPDATE userattribute set value=@value where userattribute.userid=@userid and userattribute.attributeid=@attributeid; 
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -783,4 +865,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-04-28 21:39:46
+-- Dump completed on 2017-05-05 20:01:24
