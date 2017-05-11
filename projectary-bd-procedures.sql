@@ -1,16 +1,6 @@
--- ###################################################
--- STORED PROCEDURES (minha responsabilidade) --
--- isAdmin
--- isTeacher
--- isStudent
--- isInGroup
--- insertNewApplication
--- addToGroup
-
--- APPLICATIONS (listar) só Admin
--- COURSEYEARS (listar) se Admin lista tudo, 
--- ###################################################
-
+-- ----------------- --
+-- STORED PROCEDURES --
+-- ----------------- --
 
 -- isAdmin --
 DROP PROCEDURE IF EXISTS isAdmin;
@@ -137,22 +127,25 @@ DELIMITER ;
 -- listApplications --
 DROP PROCEDURE IF EXISTS listApplications;
 DELIMITER $$
-CREATE PROCEDURE listApplications (IN projectid INT, IN approved INT)
+CREATE PROCEDURE listApplications (IN userid INT, IN projectid INT, IN approved INT)
 BEGIN
-	CASE
-		WHEN approved = 0 THEN
-			IF (projectid > 0) THEN
-				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) = 0000;
-			ELSE
-				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) = 0000;
-			END IF;
-		WHEN approved = 1 THEN
-			IF (projectid > 0) THEN
-				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) != 0000;
-			ELSE
-				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) != 0000;
-			END IF;			
-	END CASE;
+	CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		CASE
+			WHEN approved = 0 THEN
+				IF (projectid > 0) THEN
+					SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) = 0000;
+				ELSE
+					SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) = 0000;
+				END IF;
+			WHEN approved = 1 THEN
+				IF (projectid > 0) THEN
+					SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) != 0000;
+				ELSE
+					SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) != 0000;
+				END IF;			
+		END CASE;
+	END IF;
 END$$
 DELIMITER ;
 
@@ -250,6 +243,18 @@ BEGIN
 			DELETE FROM `group` WHERE `group`.id = groupid;
 			SET state = TRUE;
 		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- listGroups --
+DROP PROCEDURE IF EXISTS listGroups;
+DELIMITER $$
+CREATE PROCEDURE listGroups(IN userid INT)
+BEGIN
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		SELECT g.id, g.`desc`, g.`password` FROM `group` g;
 	END IF;
 END$$
 DELIMITER ;
