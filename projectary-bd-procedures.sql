@@ -259,9 +259,16 @@ BEGIN
 END$$
 DELIMITER ;
 
-
-
-
-
-
-
+-- listGroupDetails --
+DROP PROCEDURE IF EXISTS listGroupDetails;
+DELIMITER $$
+CREATE PROCEDURE listGroupDetails (IN userid INT, IN groupid INT)
+BEGIN
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+			SELECT g.`desc`, u.id, u.`name` FROM `group` g, groupuser gu, `user` u WHERE g.id = groupid AND g.id = gu.groupid AND u.id = gu.userid;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
