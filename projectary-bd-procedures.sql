@@ -1,9 +1,15 @@
+-- ----------------- --
+-- STORED PROCEDURES --
+-- ----------------- --
+
+-- isAdmin --
+DROP PROCEDURE IF EXISTS isAdmin;
+DELIMITER $$
 CREATE PROCEDURE isAdmin(IN id INT, OUT isAdmin BOOL)
 BEGIN
 	SET isAdmin = (SELECT u.isadmin FROM user u WHERE u.id = id);
 END$$
 DELIMITER ;
-
 
 -- isteacher --
 DROP PROCEDURE IF EXISTS isTeacher;
@@ -14,7 +20,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-
 -- isStudent --
 DROP PROCEDURE IF EXISTS isStudent;
 DELIMITER $$
@@ -23,7 +28,6 @@ BEGIN
 	SET isStudent = (SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "student"));
 END$$
 DELIMITER ;
-
 
 -- isInGroup --
 DROP PROCEDURE IF EXISTS isInGroup;
@@ -34,7 +38,6 @@ BEGIN
 END$$
 DELIMITER ;
 
-
 -- isInProject --
 DROP PROCEDURE IF EXISTS isInProject;
 DELIMITER $$
@@ -43,7 +46,6 @@ BEGIN
 	SET isInProject = (SELECT EXISTS(SELECT * FROM groupuser gu, application a WHERE gu.userid = userid AND gu.groupid = a.groupid AND YEAR(a.approvedin) != 0000));
 END$$
 DELIMITER ;
-
 
 -- addToGroup --
 DROP PROCEDURE IF EXISTS addToGroup;
@@ -64,7 +66,6 @@ BEGIN
 	END IF;
 END$$
 DELIMITER ;
-
 
 -- insertNewGroup --
 DROP PROCEDURE IF EXISTS insertNewGroup;
@@ -126,22 +127,25 @@ DELIMITER ;
 -- listApplications --
 DROP PROCEDURE IF EXISTS listApplications;
 DELIMITER $$
-CREATE PROCEDURE listApplications (IN projectid INT, IN approved INT)
+CREATE PROCEDURE listApplications (IN userid INT, IN projectid INT, IN approved INT)
 BEGIN
-	CASE
-		WHEN approved = 0 THEN
-			IF (projectid > 0) THEN
-				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) = 0000;
-			ELSE
-				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) = 0000;
-			END IF;
-		WHEN approved = 1 THEN
-			IF (projectid > 0) THEN
-				SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) != 0000;
-			ELSE
-				SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) != 0000;
-			END IF;			
-	END CASE;
+	CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		CASE
+			WHEN approved = 0 THEN
+				IF (projectid > 0) THEN
+					SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) = 0000;
+				ELSE
+					SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) = 0000;
+				END IF;
+			WHEN approved = 1 THEN
+				IF (projectid > 0) THEN
+					SELECT a.groupid, a.submitedin, a.approvedin FROM application a WHERE a.projectid = projectid AND YEAR(a.approvedin) != 0000;
+				ELSE
+					SELECT a.groupid, a.projectid, a.submitedin, a.approvedin FROM application a WHERE YEAR(a.approvedin) != 0000;
+				END IF;			
+		END CASE;
+	END IF;
 END$$
 DELIMITER ;
 
@@ -192,5 +196,79 @@ BEGIN
 		WHEN approved = 1 THEN
 				SELECT * FROM project p WHERE p.courseid = courseid AND p.year = schoolyear AND YEAR(p.approvedin) IS NOT NULL;
 	END CASE;
+END$$
+DELIMITER ;
+
+-- descExists --
+DROP PROCEDURE IF EXISTS descExists;
+DELIMITER $$
+CREATE PROCEDURE descExists(IN description VARCHAR(255), OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.`desc` like description)) THEN
+			SET state = TRUE;
+	END IF;
+END$$
+DELIMITER ;
+
+-- editGroup --
+DROP PROCEDURE IF EXISTS editGroup;
+DELIMITER $$
+CREATE PROCEDURE editGroup(IN userid INT, IN groupid INT, IN description VARCHAR(255), pass VARCHAR(255), OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		CALL descExists(description, @descExists);
+        IF (@descExists = FALSE) THEN
+			IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+				UPDATE `group` SET `desc` = description, `password` = pass
+					WHERE `group`.id = groupid;
+				SET state = TRUE;
+			END IF;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- deleteGroup --
+DROP PROCEDURE IF EXISTS deleteGroup;
+DELIMITER $$
+CREATE PROCEDURE deleteGroup(IN userid INT, IN groupid INT, OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+        IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+			DELETE FROM `group` WHERE `group`.id = groupid;
+			SET state = TRUE;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- listGroups --
+DROP PROCEDURE IF EXISTS listGroups;
+DELIMITER $$
+CREATE PROCEDURE listGroups(IN userid INT)
+BEGIN
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		SELECT g.id, g.`desc`, g.`password` FROM `group` g;
+	END IF;
+END$$
+DELIMITER ;
+
+-- listGroupDetails --
+DROP PROCEDURE IF EXISTS listGroupDetails;
+DELIMITER $$
+CREATE PROCEDURE listGroupDetails (IN userid INT, IN groupid INT)
+BEGIN
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+			SELECT g.`desc`, u.id, u.`name` FROM `group` g, groupuser gu, `user` u WHERE g.id = groupid AND g.id = gu.groupid AND u.id = gu.userid;
+		END IF;
+	END IF;
 END$$
 DELIMITER ;
