@@ -106,6 +106,120 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- descExists --
+DROP PROCEDURE IF EXISTS descExists;
+DELIMITER $$
+CREATE PROCEDURE descExists(IN description VARCHAR(255), OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.`desc` like description)) THEN
+			SET state = TRUE;
+	END IF;
+END$$
+DELIMITER ;
+
+-- editGroup --
+DROP PROCEDURE IF EXISTS editGroup;
+DELIMITER $$
+CREATE PROCEDURE editGroup(IN userid INT, IN groupid INT, IN description VARCHAR(255), pass VARCHAR(255), OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		CALL descExists(description, @descExists);
+        IF (@descExists = FALSE) THEN
+			IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+				UPDATE `group` SET `desc` = description, `password` = pass
+					WHERE `group`.id = groupid;
+				SET state = TRUE;
+			END IF;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- deleteGroup --
+DROP PROCEDURE IF EXISTS deleteGroup;
+DELIMITER $$
+CREATE PROCEDURE deleteGroup(IN userid INT, IN groupid INT, OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+        IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+			DELETE FROM `group` WHERE `group`.id = groupid;
+			SET state = TRUE;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- listGroupDetails --
+DROP PROCEDURE IF EXISTS listGroupDetails;
+DELIMITER $$
+CREATE PROCEDURE listGroupDetails (IN userid INT, IN groupid INT)
+BEGIN
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+			SELECT g.`desc`, u.id, u.`name` FROM `group` g, groupuser gu, `user` u WHERE g.id = groupid AND g.id = gu.groupid AND u.id = gu.userid;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- emailExists --
+DROP PROCEDURE IF EXISTS emailExists;
+DELIMITER $$
+CREATE PROCEDURE emailExists(IN email VARCHAR(255), OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    IF (SELECT EXISTS(SELECT * FROM `user` u WHERE u.email like email)) THEN
+			SET state = TRUE;
+	END IF;
+END$$
+DELIMITER ;
+
+-- externalExists --
+DROP PROCEDURE IF EXISTS externalExists;
+DELIMITER $$
+CREATE PROCEDURE externalExists(IN external_id VARCHAR(255), OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    IF (SELECT EXISTS(SELECT * FROM `user` u WHERE u.external_id like external_id)) THEN
+			SET state = TRUE;
+	END IF;
+END$$
+DELIMITER ;
+
+-- insertNewUser --
+DROP PROCEDURE IF EXISTS insertNewUser;
+DELIMITER $$
+CREATE PROCEDURE insertNewUser (IN `name` VARCHAR(255), IN photo VARCHAR (255), IN external_id VARCHAR (255), IN typeid INT, IN email VARCHAR (255), IN pass VARCHAR (255))
+BEGIN
+    CALL emailExists(email, @emailExists);
+    IF (@emailExists = FALSE) THEN
+		CALL externalExists(external_id, @externalExists);
+		IF (@externalExists = FALSE) THEN
+			INSERT INTO `user`(`name`, photo, external_id, typeid, email, phonenumber, isadmin, `password`, locked, active)
+				VALUES (`name`, photo, external_id, typeid, email, phonenumber, 0, MD5(pass), 0, 0);
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- activateUser --
+DROP PROCEDURE IF EXISTS activateUser;
+DELIMITER $$
+CREATE PROCEDURE activateUser (IN userid INT, IN userToActivate INT)
+BEGIN
+	CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		UPDATE `user` u SET u.active = 1;
+	END IF;
+END$$
+DELIMITER ;
+
 -- listCouses --
 DROP PROCEDURE IF EXISTS listCouses;
 DELIMITER $$
@@ -199,54 +313,6 @@ BEGIN
 END$$
 DELIMITER ;
 
--- descExists --
-DROP PROCEDURE IF EXISTS descExists;
-DELIMITER $$
-CREATE PROCEDURE descExists(IN description VARCHAR(255), OUT state BOOL)
-BEGIN
-	SET state = FALSE;
-    IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.`desc` like description)) THEN
-			SET state = TRUE;
-	END IF;
-END$$
-DELIMITER ;
-
--- editGroup --
-DROP PROCEDURE IF EXISTS editGroup;
-DELIMITER $$
-CREATE PROCEDURE editGroup(IN userid INT, IN groupid INT, IN description VARCHAR(255), pass VARCHAR(255), OUT state BOOL)
-BEGIN
-	SET state = FALSE;
-    CALL isAdmin(userid, @isAdmin);
-    IF (@isAdmin = TRUE) THEN
-		CALL descExists(description, @descExists);
-        IF (@descExists = FALSE) THEN
-			IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
-				UPDATE `group` SET `desc` = description, `password` = pass
-					WHERE `group`.id = groupid;
-				SET state = TRUE;
-			END IF;
-		END IF;
-	END IF;
-END$$
-DELIMITER ;
-
--- deleteGroup --
-DROP PROCEDURE IF EXISTS deleteGroup;
-DELIMITER $$
-CREATE PROCEDURE deleteGroup(IN userid INT, IN groupid INT, OUT state BOOL)
-BEGIN
-	SET state = FALSE;
-    CALL isAdmin(userid, @isAdmin);
-    IF (@isAdmin = TRUE) THEN
-        IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
-			DELETE FROM `group` WHERE `group`.id = groupid;
-			SET state = TRUE;
-		END IF;
-	END IF;
-END$$
-DELIMITER ;
-
 -- listGroups --
 DROP PROCEDURE IF EXISTS listGroups;
 DELIMITER $$
@@ -255,20 +321,6 @@ BEGIN
     CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
 		SELECT g.id, g.`desc`, g.`password` FROM `group` g;
-	END IF;
-END$$
-DELIMITER ;
-
--- listGroupDetails --
-DROP PROCEDURE IF EXISTS listGroupDetails;
-DELIMITER $$
-CREATE PROCEDURE listGroupDetails (IN userid INT, IN groupid INT)
-BEGIN
-    CALL isAdmin(userid, @isAdmin);
-    IF (@isAdmin = TRUE) THEN
-		IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
-			SELECT g.`desc`, u.id, u.`name` FROM `group` g, groupuser gu, `user` u WHERE g.id = groupid AND g.id = gu.groupid AND u.id = gu.userid;
-		END IF;
 	END IF;
 END$$
 DELIMITER ;
