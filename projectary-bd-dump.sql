@@ -134,7 +134,7 @@ CREATE TABLE `group` (
   `password` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `group_desc_uindex` (`desc`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -143,6 +143,7 @@ CREATE TABLE `group` (
 
 LOCK TABLES `group` WRITE;
 /*!40000 ALTER TABLE `group` DISABLE KEYS */;
+INSERT INTO `group` VALUES (1,'chouriças','1234');
 /*!40000 ALTER TABLE `group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -156,6 +157,7 @@ DROP TABLE IF EXISTS `groupuser`;
 CREATE TABLE `groupuser` (
   `groupid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
+  `owner` tinyint(1) DEFAULT NULL,
   `grade` decimal(10,0) NOT NULL DEFAULT '0',
   `approvedin` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`groupid`,`userid`)
@@ -168,6 +170,7 @@ CREATE TABLE `groupuser` (
 
 LOCK TABLES `groupuser` WRITE;
 /*!40000 ALTER TABLE `groupuser` DISABLE KEYS */;
+INSERT INTO `groupuser` VALUES (1,1,1,0,NULL);
 /*!40000 ALTER TABLE `groupuser` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -223,6 +226,29 @@ CREATE TABLE `projectattribute` (
 LOCK TABLES `projectattribute` WRITE;
 /*!40000 ALTER TABLE `projectattribute` DISABLE KEYS */;
 /*!40000 ALTER TABLE `projectattribute` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `projectteacher`
+--
+
+DROP TABLE IF EXISTS `projectteacher`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `projectteacher` (
+  `userid` int(11) NOT NULL DEFAULT '0',
+  `projectid` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`userid`,`projectid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `projectteacher`
+--
+
+LOCK TABLES `projectteacher` WRITE;
+/*!40000 ALTER TABLE `projectteacher` DISABLE KEYS */;
+/*!40000 ALTER TABLE `projectteacher` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -289,13 +315,14 @@ CREATE TABLE `user` (
   `email` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `phonenumber` varchar(14) COLLATE utf8_bin DEFAULT NULL,
   `isadmin` tinyint(1) NOT NULL DEFAULT '0',
+  `token` varchar(5000) COLLATE utf8_bin DEFAULT NULL,
   `password` varchar(255) COLLATE utf8_bin NOT NULL,
   `locked` tinyint(1) DEFAULT '0',
   `active` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_external_id_uindex` (`external_id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users Table';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users Table';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -304,7 +331,6 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Aluno testes','default_photo.png','1234',1,'1@ipt.pt','1234567789',0,'123qwe',0,0),(4,'Aluno testes','default_photo.png','12345',1,'2@ipt.pt','1234567789',0,'123qwe',0,0),(5,'Aluno testes','default_photo.png','123456',1,'3@ipt.pt','1234567789',0,'123qwe',0,0),(7,'Aluno testes','default_photo.png','12345678',1,'5@ipt.pt','1234567789',0,'123qwe',0,0);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -836,6 +862,27 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `JoinExistingGroup` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `JoinExistingGroup`(IN groupid INT, IN grouppassword VARCHAR(255), IN userid INT)
+BEGIN
+  if EXISTS(SELECT * from `group`,groupuser where `group`.`id`=@groupid and `group`.`password`=@grouppassword and `group`.`id` =`groupuser`.`groupid` and `groupuser`.`userid` <>@userid)=1 THEN
+    INSERT INTO groupuser (groupid, userid)VALUES (groupid,userid);
+  END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `UpdateUserAttribute` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -865,4 +912,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-05-05 20:01:24
+-- Dump completed on 2017-05-26 18:35:06
