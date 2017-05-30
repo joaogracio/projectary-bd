@@ -2,4 +2,5 @@ Projectary - Database Documentation
 ===================
 
 
-In this document there will the specifications for the SPs and usage examples. All the info will be available in the Wiki section.
+The documentation of this page is included in the documentation folder named Documentation. 
+There are many files of extencion .md used for documentation with markup.
