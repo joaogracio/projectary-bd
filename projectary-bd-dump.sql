@@ -386,19 +386,22 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `addToGroup`(IN userid INT, IN groupid INT, IN password VARCHAR(255), OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addToGroup`(IN userid INT, IN groupid INT, IN password VARCHAR(255), OUT state BOOL)
 BEGIN
 	SET state = FALSE;
-	CALL isInProject(userid, @project);
-	IF (@project = FALSE) THEN
-		CALL isInGroup(userid, groupid, @isInGroup);
-        IF (@isInGroup = FALSE) THEN
-			IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid AND g.password = password)) THEN
-				INSERT INTO groupuser(groupid, userid)
-					VALUES (groupid, userid);
-                    SET state = TRUE;
+    CALL isStudent(userid, @isStudent);
+    IF (@isStudent = TRUE) THEN
+		CALL isInProject(userid, @project);
+		IF (@project = FALSE) THEN
+			CALL isInGroup(userid, groupid, @isInGroup);
+			IF (@isInGroup = FALSE) THEN
+				IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid AND g.password = password)) THEN
+					INSERT INTO groupuser(groupid, userid)
+						VALUES (groupid, userid);
+						SET state = TRUE;
+				END IF;
 			END IF;
 		END IF;
 	END IF;
@@ -1006,4 +1009,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-01 15:43:44
+-- Dump completed on 2017-06-01 23:20:39
