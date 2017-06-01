@@ -416,14 +416,15 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `deleteGroup`(IN userid INT, IN groupid INT, OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteGroup`(IN userid INT, IN groupid INT, OUT state BOOL)
 BEGIN
 	SET state = FALSE;
     CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
         IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+			DELETE FROM groupuser WHERE groupuser.groupid = groupid;
 			DELETE FROM `group` WHERE `group`.id = groupid;
 			SET state = TRUE;
 		END IF;
@@ -1005,4 +1006,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-05-30 21:00:10
+-- Dump completed on 2017-06-01 15:43:44

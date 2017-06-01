@@ -147,6 +147,7 @@ BEGIN
     CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
         IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid)) THEN
+			DELETE FROM groupuser WHERE groupuser.groupid = groupid;
 			DELETE FROM `group` WHERE `group`.id = groupid;
 			SET state = TRUE;
 		END IF;
