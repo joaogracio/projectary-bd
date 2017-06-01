@@ -10,6 +10,6 @@ Projectary - Test Data
 
 The database has 3 users by default.
 
- - **id** = 1, **teacher**, **admin**, **pass** = 123qwe, **active**
- - **id** = 2, **teacher**, **admin**, **pass** = 123qwe, **active**
- - **id** = 3, **student**, **pass** = 123qwe, **active**
+ - **id** = 1, **teacher**, **email** = ninja@caldas.ipt, **admin**, **pass** = 123qwe, **active**
+ - **id** = 2, **teacher**, **email** = ze@cabra.ipt, **admin**, **pass** = 123qwe, **active**
+ - **id** = 3, **student**, **email** = cebola@mole.ipt, **pass** = 123qwe, **active**
