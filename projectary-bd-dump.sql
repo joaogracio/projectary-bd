@@ -724,7 +724,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `InsertUserAttribute` */;
+/*!50003 DROP PROCEDURE IF EXISTS `insertUserAttribute` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -732,11 +732,11 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `InsertUserAttribute`(IN userid INT,IN attributeid INT,IN value VARCHAR(255))
+CREATE DEFINER=`root`@`%` PROCEDURE `insertUserAttribute`(IN userid INT, IN attributeid INT, IN `value` VARCHAR(255))
 BEGIN
-		INSERT INTO userattribute VALUES (userid,attributeid,value);
+		INSERT INTO userattribute VALUES (userid, attributeid, `value`);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -981,7 +981,7 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `UpdateUserAttribute` */;
+/*!50003 DROP PROCEDURE IF EXISTS `updateUserAttribute` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -989,11 +989,11 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `UpdateUserAttribute`(IN userid INT,IN attributeid INT,IN value VARCHAR(255))
+CREATE DEFINER=`root`@`%` PROCEDURE `updateUserAttribute`(IN userid INT, IN attributeid INT, IN `value` VARCHAR(255))
 BEGIN
-    UPDATE userattribute set value=@value where userattribute.userid=@userid and userattribute.attributeid=@attributeid; 
+    UPDATE userattribute SET `value` = `value` WHERE userattribute.userid = userid AND userattribute.attributeid = attributeid; 
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1010,4 +1010,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-05 23:43:29
+-- Dump completed on 2017-06-06 16:31:38
