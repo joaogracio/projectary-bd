@@ -128,7 +128,7 @@ CREATE TABLE `group` (
   `password` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `group_desc_uindex` (`desc`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -137,7 +137,7 @@ CREATE TABLE `group` (
 
 LOCK TABLES `group` WRITE;
 /*!40000 ALTER TABLE `group` DISABLE KEYS */;
-INSERT INTO `group` VALUES (1,'chouriças','1234');
+INSERT INTO `group` VALUES (1,'chouriças','1234'),(2,'pogamar','1234');
 /*!40000 ALTER TABLE `group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -152,7 +152,7 @@ CREATE TABLE `groupuser` (
   `groupid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
   `owner` tinyint(1) DEFAULT NULL,
-  `grade` decimal(10,0) NOT NULL DEFAULT '0',
+  `grade` tinyint(4) NOT NULL DEFAULT '0',
   `approvedin` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`groupid`,`userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -164,7 +164,7 @@ CREATE TABLE `groupuser` (
 
 LOCK TABLES `groupuser` WRITE;
 /*!40000 ALTER TABLE `groupuser` DISABLE KEYS */;
-INSERT INTO `groupuser` VALUES (1,1,1,0,NULL);
+INSERT INTO `groupuser` VALUES (1,3,1,15,'2017-06-06 23:07:26'),(1,4,0,0,'2017-06-06 23:07:26'),(2,5,1,0,NULL);
 /*!40000 ALTER TABLE `groupuser` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -316,7 +316,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_external_id_uindex` (`external_id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users Table';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users Table';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -325,7 +325,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Ninja das Caldas','default_photo.png','666',2,'ninja@caldas.ipt',NULL,1,NULL,'46f94c8de14fb36680850768ff1b7f2a',0,1),(2,'Ze Cabra','default_photo.png','999',2,'ze@cabra.ipt',NULL,1,NULL,'46f94c8de14fb36680850768ff1b7f2a',0,1),(3,'Cebola Mole','default_photo.png','007',1,'cebola@mole.ipt',NULL,0,NULL,'46f94c8de14fb36680850768ff1b7f2a',0,1);
+INSERT INTO `user` VALUES (1,'Ninja das Caldas','default_photo.png','666',2,'ninja@caldas.ipt',NULL,1,NULL,'46f94c8de14fb36680850768ff1b7f2a',0,1),(2,'Ze Cabra','default_photo.png','999',2,'ze@cabra.ipt',NULL,0,NULL,'46f94c8de14fb36680850768ff1b7f2a',0,1),(3,'Cebola Mole','default_photo.png','007',1,'cebola@mole.ipt',NULL,0,NULL,'46f94c8de14fb36680850768ff1b7f2a',0,1),(4,'Maria Leal','default_photo.png','123',1,'maria@leal.ipt',NULL,0,NULL,'46f94c8de14fb36680850768ff1b7f2a',0,1),(5,'Quim Barreiros','default_photo.png','333',1,'quim@barreiros.ipt',NULL,0,NULL,'46f94c8de14fb36680850768ff1b7f2a',0,1);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -547,6 +547,36 @@ BEGIN
 	SET state = FALSE;
     IF (SELECT EXISTS(SELECT * FROM `user` u WHERE u.external_id like external_id)) THEN
 			SET state = TRUE;
+	END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `insertGrade` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `insertGrade`(IN userid INT, IN studentid INT, IN groupDesc VARCHAR(255), IN grade TINYINT, OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    SET @groupid = (SELECT g.id FROM `group` g WHERE g.`desc` LIKE groupDesc);
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		CALL isInGroup(studentid, @groupid, @isInGroup);
+		IF (@isInGroup = TRUE) THEN
+			IF (grade BETWEEN 0 AND 20) THEN
+				UPDATE groupuser g SET g.grade = grade WHERE g.groupid = @groupid AND g.userid = studentid;
+				SET state = TRUE;
+			END IF;
+		END IF;
 	END IF;
 END ;;
 DELIMITER ;
@@ -1010,4 +1040,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-06 17:19:23
+-- Dump completed on 2017-06-07  0:09:46
