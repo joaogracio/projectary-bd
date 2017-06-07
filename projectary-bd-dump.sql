@@ -25,8 +25,8 @@ DROP TABLE IF EXISTS `application`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `application` (
-  `groupid` int(11) NOT NULL,
-  `projectid` int(11) NOT NULL,
+  `groupid` int(11) unsigned NOT NULL,
+  `projectid` int(11) unsigned NOT NULL,
   `submitedin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `approvedin` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`groupid`,`projectid`)
@@ -50,7 +50,7 @@ DROP TABLE IF EXISTS `attribute`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `attribute` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `desc` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `createdin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -74,9 +74,9 @@ DROP TABLE IF EXISTS `course`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `course` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `desc` varchar(255) COLLATE utf8_bin NOT NULL,
-  `schoolid` int(11) NOT NULL,
+  `schoolid` int(11) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -99,7 +99,7 @@ DROP TABLE IF EXISTS `courseyear`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `courseyear` (
-  `course` int(11) NOT NULL,
+  `course` int(11) unsigned NOT NULL,
   `year` year(4) NOT NULL,
   `active` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`course`,`year`)
@@ -123,7 +123,7 @@ DROP TABLE IF EXISTS `group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `group` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `desc` varchar(255) COLLATE utf8_bin NOT NULL,
   `password` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
@@ -149,8 +149,8 @@ DROP TABLE IF EXISTS `groupuser`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `groupuser` (
-  `groupid` int(11) NOT NULL,
-  `userid` int(11) NOT NULL,
+  `groupid` int(11) unsigned NOT NULL,
+  `userid` int(11) unsigned NOT NULL,
   `owner` tinyint(1) NOT NULL DEFAULT '0',
   `grade` tinyint(4) DEFAULT NULL,
   `approvedin` timestamp NULL DEFAULT NULL,
@@ -176,13 +176,13 @@ DROP TABLE IF EXISTS `project`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `project` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `approvedin` timestamp NULL DEFAULT NULL,
   `year` year(4) NOT NULL,
-  `courseid` int(11) NOT NULL,
+  `courseid` int(11) unsigned NOT NULL,
   `name` varchar(255) COLLATE utf8_bin NOT NULL,
   `description` varchar(255) COLLATE utf8_bin NOT NULL,
-  `userid` int(11) NOT NULL,
+  `userid` int(11) unsigned NOT NULL,
   `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -206,8 +206,8 @@ DROP TABLE IF EXISTS `projectattribute`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `projectattribute` (
-  `projectid` int(11) NOT NULL,
-  `attributeid` int(11) NOT NULL,
+  `projectid` int(11) unsigned NOT NULL,
+  `attributeid` int(11) unsigned NOT NULL,
   `value` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`projectid`,`attributeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -230,8 +230,8 @@ DROP TABLE IF EXISTS `projectteacher`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `projectteacher` (
-  `userid` int(11) NOT NULL DEFAULT '0',
-  `projectid` int(11) NOT NULL DEFAULT '0',
+  `userid` int(11) unsigned NOT NULL DEFAULT '0',
+  `projectid` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`userid`,`projectid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -253,7 +253,7 @@ DROP TABLE IF EXISTS `school`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `school` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `desc` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -277,7 +277,7 @@ DROP TABLE IF EXISTS `type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `type` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `desc` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Types Table';
@@ -301,11 +301,11 @@ DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_bin NOT NULL,
   `photo` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT 'default_photo.png',
   `external_id` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `typeid` int(11) NOT NULL,
+  `typeid` int(11) unsigned NOT NULL,
   `email` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `phonenumber` varchar(14) COLLATE utf8_bin DEFAULT NULL,
   `isadmin` tinyint(1) NOT NULL DEFAULT '0',
@@ -337,8 +337,8 @@ DROP TABLE IF EXISTS `userattribute`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `userattribute` (
-  `userid` int(11) NOT NULL,
-  `attributeid` int(11) NOT NULL,
+  `userid` int(11) unsigned NOT NULL,
+  `attributeid` int(11) unsigned NOT NULL,
   `value` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`userid`,`attributeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -1068,4 +1068,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-07 23:13:49
+-- Dump completed on 2017-06-08  0:17:09
