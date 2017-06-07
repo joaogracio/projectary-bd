@@ -366,7 +366,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `activateUser`(IN userid INT, IN userToActivate INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `activateUser`(IN userid INT, IN userToActivate INT)
 BEGIN
 	CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
@@ -388,7 +388,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `addToGroup`(IN userid INT, IN groupDesc VARCHAR(255), IN password VARCHAR(255), OUT state INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addToGroup`(IN userid INT, IN groupDesc VARCHAR(255), IN password VARCHAR(255), OUT state INT)
 BEGIN
 	SET state = 0;
     SET @groupid = (SELECT g.id FROM `group` g WHERE g.`desc` LIKE groupDesc);
@@ -422,7 +422,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `deleteGroup`(IN userid INT, IN groupid INT, OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteGroup`(IN userid INT, IN groupid INT, OUT state BOOL)
 BEGIN
 	SET state = FALSE;
     CALL isAdmin(userid, @isAdmin);
@@ -449,7 +449,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `deleteUserAttribute`(IN userid INT,IN attributeid INT,IN value VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteUserAttribute`(IN userid INT,IN attributeid INT,IN value VARCHAR(255))
 BEGIN
     DELETE from userattribute where userattribute.userid=@userid and userattribute.attributeid=@attributeid;
 END ;;
@@ -468,7 +468,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `descExists`(IN description VARCHAR(255), OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `descExists`(IN description VARCHAR(255), OUT state BOOL)
 BEGIN
 	SET state = FALSE;
     IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.`desc` like description)) THEN
@@ -490,7 +490,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `editGroup`(IN userid INT, IN groupid INT, IN description VARCHAR(255), pass VARCHAR(255), OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `editGroup`(IN userid INT, IN groupid INT, IN description VARCHAR(255), pass VARCHAR(255), OUT state BOOL)
 BEGIN
 	SET state = FALSE;
     CALL isAdmin(userid, @isAdmin);
@@ -520,7 +520,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `emailExists`(IN email VARCHAR(255), OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `emailExists`(IN email VARCHAR(255), OUT state BOOL)
 BEGIN
 	SET state = FALSE;
     IF (SELECT EXISTS(SELECT * FROM `user` u WHERE u.email like email)) THEN
@@ -542,7 +542,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `externalExists`(IN external_id VARCHAR(255), OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `externalExists`(IN external_id VARCHAR(255), OUT state BOOL)
 BEGIN
 	SET state = FALSE;
     IF (SELECT EXISTS(SELECT * FROM `user` u WHERE u.external_id like external_id)) THEN
@@ -564,7 +564,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertGrade`(IN userid INT, IN studentid INT, IN groupid INT, IN grade TINYINT, OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertGrade`(IN userid INT, IN studentid INT, IN groupid INT, IN grade TINYINT, OUT state BOOL)
 BEGIN
 	SET state = FALSE;
     CALL isAdmin(userid, @isAdmin);
@@ -593,7 +593,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertNewApplication`(IN userid INT, IN groupid INT, IN projectid INT, OUT state BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertNewApplication`(IN userid INT, IN groupid INT, IN projectid INT, OUT state BOOL)
 BEGIN
 	SET state = FALSE;
 	CALL isStudent(userid, @student);
@@ -624,9 +624,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertNewCourse`(IN schoolid INT, IN description VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertNewCourse`(IN schoolid INT, IN description VARCHAR(255))
 BEGIN
 	INSERT INTO course (schoolid, `desc`)
 		VALUES (schoolid, description);
@@ -665,7 +665,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertNewGroup`(IN userid INT, IN description VARCHAR(255), IN password VARCHAR(255), OUT groupid INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertNewGroup`(IN userid INT, IN description VARCHAR(255), IN password VARCHAR(255), OUT groupid INT)
 BEGIN
 	CALL isInProject(userid, @project);
 	IF (@project=FALSE) THEN
@@ -692,9 +692,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertNewProject`(IN schoolyear YEAR, IN courseid INT, IN name VARCHAR(255), IN description VARCHAR(255), IN userid INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertNewProject`(IN schoolyear YEAR, IN courseid INT, IN name VARCHAR(255), IN description VARCHAR(255), IN userid INT)
 BEGIN
 	CALL isTeacher (userid, @teacher);
     IF (@teacher = 1) THEN
@@ -718,9 +718,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertNewType`(IN description VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertNewType`(IN description VARCHAR(255))
 BEGIN
 	INSERT INTO type (`desc`)
 		VALUES (description);
@@ -740,7 +740,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertNewUser`(IN `name` VARCHAR(255), IN photo VARCHAR (255), IN external_id VARCHAR (255), IN typeid INT, IN email VARCHAR (255), IN pass VARCHAR (255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertNewUser`(IN `name` VARCHAR(255), IN photo VARCHAR (255), IN external_id VARCHAR (255), IN typeid INT, IN email VARCHAR (255), IN pass VARCHAR (255))
 BEGIN
     CALL emailExists(email, @emailExists);
     IF (@emailExists = FALSE) THEN
@@ -769,7 +769,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertUserAttribute`(IN userid INT, IN attributeid INT, IN `value` VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertUserAttribute`(IN userid INT, IN attributeid INT, IN `value` VARCHAR(255))
 BEGIN
 		INSERT INTO userattribute VALUES (userid, attributeid, `value`);
 END ;;
@@ -788,7 +788,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `isAdmin`(IN id INT, OUT isAdmin BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `isAdmin`(IN id INT, OUT isAdmin BOOL)
 BEGIN
 	SET isAdmin = (SELECT u.isadmin FROM user u WHERE u.id = id);
 END ;;
@@ -807,7 +807,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `isFinished`(IN userid INT, IN groupid INT, OUT isFinished BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `isFinished`(IN userid INT, IN groupid INT, OUT isFinished BOOL)
 BEGIN
 	SET isFinished = FALSE;
     CALL isAdmin(userid, @isAdmin);
@@ -830,7 +830,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `isInGroup`(IN userid INT, IN groupid INT, OUT isInGroup BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `isInGroup`(IN userid INT, IN groupid INT, OUT isInGroup BOOL)
 BEGIN
 	SET isInGroup = (SELECT EXISTS(SELECT * FROM groupuser gu WHERE gu.userid = userid AND gu.groupid = groupid));
 END ;;
@@ -849,7 +849,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `isInProject`(IN userid INT, OUT isInProject BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `isInProject`(IN userid INT, OUT isInProject BOOL)
 BEGIN
 	SET isInProject = (SELECT EXISTS(SELECT * FROM groupuser gu, application a WHERE gu.userid = userid AND gu.groupid = a.groupid AND YEAR(a.approvedin) != 0000));
 END ;;
@@ -868,7 +868,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `isStudent`(IN id INT, OUT isStudent BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `isStudent`(IN id INT, OUT isStudent BOOL)
 BEGIN
 	SET isStudent = (SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "student"));
 END ;;
@@ -887,7 +887,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `isTeacher`(IN id INT, OUT isTeacher BOOL)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `isTeacher`(IN id INT, OUT isTeacher BOOL)
 BEGIN
 	SET isTeacher = (SELECT EXISTS(SELECT * FROM user u, type t WHERE u.id = id AND u.typeid = t.id AND t.`desc` LIKE "teacher"));
 END ;;
@@ -904,9 +904,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `listApplications`(IN userid INT, IN projectid INT, IN approved INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `listApplications`(IN userid INT, IN projectid INT, IN approved INT)
 BEGIN
 	CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
@@ -939,9 +939,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `listCouses`(IN schoolid INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `listCouses`(IN schoolid INT)
 BEGIN
 	SELECT c.`desc` as 'course' FROM course c WHERE c.schoolid = schoolid;
 END ;;
@@ -960,7 +960,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `listGroupDetails`(IN userid INT, IN groupid INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `listGroupDetails`(IN userid INT, IN groupid INT)
 BEGIN
     CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
@@ -982,9 +982,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `listGroups`(IN userid INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `listGroups`(IN userid INT)
 BEGIN
     CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
@@ -1004,9 +1004,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `listProjects`(IN courseid INT, IN schoolyear YEAR, IN approved INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `listProjects`(IN courseid INT, IN schoolyear YEAR, IN approved INT)
 BEGIN
 	CASE
 		WHEN approved = 0 THEN
@@ -1028,9 +1028,9 @@ DELIMITER ;
 /*!50003 SET character_set_results = utf8 */ ;
 /*!50003 SET collation_connection  = utf8_general_ci */ ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES' */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `listSchools`()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `listSchools`()
 BEGIN
 	SELECT s.`desc` as 'school' FROM school s;
 END ;;
@@ -1049,7 +1049,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `updateUserAttribute`(IN userid INT, IN attributeid INT, IN `value` VARCHAR(255))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateUserAttribute`(IN userid INT, IN attributeid INT, IN `value` VARCHAR(255))
 BEGIN
     UPDATE userattribute SET `value` = `value` WHERE userattribute.userid = userid AND userattribute.attributeid = attributeid; 
 END ;;
@@ -1068,4 +1068,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-07 22:42:31
+-- Dump completed on 2017-06-07 23:13:49
