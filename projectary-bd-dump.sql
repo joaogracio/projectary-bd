@@ -151,7 +151,7 @@ DROP TABLE IF EXISTS `groupuser`;
 CREATE TABLE `groupuser` (
   `groupid` int(11) NOT NULL,
   `userid` int(11) NOT NULL,
-  `owner` tinyint(1) DEFAULT NULL,
+  `owner` tinyint(1) NOT NULL DEFAULT '0',
   `grade` tinyint(4) DEFAULT NULL,
   `approvedin` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`groupid`,`userid`)
@@ -673,8 +673,8 @@ BEGIN
 		INSERT INTO `group`(`desc`, password)
 			VALUES (description, password);
 		SET groupid = (SELECT g.id FROM `group` g WHERE g.`desc` = description AND g.password = password);
-		INSERT INTO groupuser (groupid, userid)
-			VALUES (groupid, userid);
+		INSERT INTO groupuser (groupid, userid, `owner`)
+			VALUES (groupid, userid, 1);
 	END IF;
 END ;;
 DELIMITER ;
@@ -1067,4 +1067,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-07 13:47:51
+-- Dump completed on 2017-06-07 15:51:51
