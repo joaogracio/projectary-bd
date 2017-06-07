@@ -564,16 +564,15 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `insertGrade`(IN userid INT, IN studentid INT, IN groupDesc VARCHAR(255), IN grade TINYINT, OUT state BOOL)
+CREATE DEFINER=`root`@`%` PROCEDURE `insertGrade`(IN userid INT, IN studentid INT, IN groupid INT, IN grade TINYINT, OUT state BOOL)
 BEGIN
 	SET state = FALSE;
-    SET @groupid = (SELECT g.id FROM `group` g WHERE g.`desc` LIKE groupDesc);
     CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
-		CALL isInGroup(studentid, @groupid, @isInGroup);
+		CALL isInGroup(studentid, groupid, @isInGroup);
 		IF (@isInGroup = TRUE) THEN
 			IF (grade BETWEEN 0 AND 20) THEN
-				UPDATE groupuser gu SET gu.grade = grade WHERE gu.groupid = @groupid AND gu.userid = studentid;
+				UPDATE groupuser gu SET gu.grade = grade WHERE gu.groupid = groupid AND gu.userid = studentid;
 				SET state = TRUE;
 			END IF;
 		END IF;
@@ -808,13 +807,12 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `isFinished`(IN userid INT, IN desciption VARCHAR(255), OUT isFinished BOOL)
+CREATE DEFINER=`root`@`%` PROCEDURE `isFinished`(IN userid INT, IN groupid INT, OUT isFinished BOOL)
 BEGIN
 	SET isFinished = FALSE;
-    SET @groupid = (SELECT g.id FROM `group` g WHERE g.`desc` LIKE groupDesc);
     CALL isAdmin(userid, @isAdmin);
     IF (@isAdmin = TRUE) THEN
-		SET isFinished = (SELECT NOT EXISTS(SELECT * FROM groupuser gu WHERE gu.groupid = @groupid AND grade IS NULL));
+		SET isFinished = (SELECT NOT EXISTS(SELECT * FROM groupuser gu WHERE gu.groupid = groupid AND grade IS NULL));
     END IF;    
 END ;;
 DELIMITER ;
@@ -1070,4 +1068,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-07 16:25:29
+-- Dump completed on 2017-06-07 22:42:31
