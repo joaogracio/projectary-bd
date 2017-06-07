@@ -388,9 +388,9 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`%` PROCEDURE `addToGroup`(IN userid INT, IN groupDesc VARCHAR(255), IN password VARCHAR(255), OUT state BOOL)
+CREATE DEFINER=`root`@`%` PROCEDURE `addToGroup`(IN userid INT, IN groupDesc VARCHAR(255), IN password VARCHAR(255), OUT state INT)
 BEGIN
-	SET state = FALSE;
+	SET state = 0;
     SET @groupid = (SELECT g.id FROM `group` g WHERE g.`desc` LIKE groupDesc);
     CALL isStudent(userid, @isStudent);
     IF (@isStudent = TRUE) THEN
@@ -401,7 +401,7 @@ BEGIN
 				IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = @groupid AND g.password = password)) THEN
 					INSERT INTO groupuser(groupid, userid)
 						VALUES (@groupid, userid);
-						SET state = TRUE;
+						SET state = @groupid;
 				END IF;
 			END IF;
 		END IF;
@@ -1067,4 +1067,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-07  0:58:19
+-- Dump completed on 2017-06-07 13:47:51
