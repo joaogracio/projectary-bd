@@ -670,11 +670,14 @@ CREATE DEFINER=`root`@`%` PROCEDURE `insertNewGroup`(IN userid INT, IN descripti
 BEGIN
 	CALL isInProject(userid, @project);
 	IF (@project=FALSE) THEN
-		INSERT INTO `group`(`desc`, password)
-			VALUES (description, password);
-		SET groupid = (SELECT g.id FROM `group` g WHERE g.`desc` = description AND g.password = password);
-		INSERT INTO groupuser (groupid, userid, `owner`)
-			VALUES (groupid, userid, 1);
+   		CALL descExists(description, @descExists);
+        IF (@descExists = FALSE) THEN
+			INSERT INTO `group`(`desc`, password)
+				VALUES (description, password);
+			SET groupid = (SELECT g.id FROM `group` g WHERE g.`desc` = description AND g.password = password);
+			INSERT INTO groupuser (groupid, userid, `owner`)
+				VALUES (groupid, userid, 1);
+		END IF;
 	END IF;
 END ;;
 DELIMITER ;
@@ -1067,4 +1070,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-07 15:51:51
+-- Dump completed on 2017-06-07 16:25:29
