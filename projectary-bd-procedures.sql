@@ -50,17 +50,21 @@ DELIMITER ;
 -- addToGroup --
 DROP PROCEDURE IF EXISTS addToGroup;
 DELIMITER $$
-CREATE PROCEDURE addToGroup(IN userid INT, IN groupid INT, IN password VARCHAR(255), OUT state BOOL)
+CREATE PROCEDURE addToGroup(IN userid INT, IN groupDesc VARCHAR(255), IN password VARCHAR(255), OUT state BOOL)
 BEGIN
 	SET state = FALSE;
-	CALL isInProject(userid, @project);
-	IF (@project = FALSE) THEN
-		CALL isInGroup(userid, groupid, @isInGroup);
-        IF (@isInGroup = FALSE) THEN
-			IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = groupid AND g.password = password)) THEN
-				INSERT INTO groupuser(groupid, userid)
-					VALUES (groupid, userid);
-                    SET state = TRUE;
+    SET @groupid = (SELECT g.id FROM `group` g WHERE g.`desc` LIKE groupDesc);
+    CALL isStudent(userid, @isStudent);
+    IF (@isStudent = TRUE) THEN
+		CALL isInProject(userid, @project);
+		IF (@project = FALSE) THEN
+			CALL isInGroup(userid, @groupid, @isInGroup);
+			IF (@isInGroup = FALSE) THEN
+				IF (SELECT EXISTS(SELECT * FROM `group` g WHERE g.id = @groupid AND g.password = password)) THEN
+					INSERT INTO groupuser(groupid, userid)
+						VALUES (@groupid, userid);
+						SET state = TRUE;
+				END IF;
 			END IF;
 		END IF;
 	END IF;
@@ -202,8 +206,11 @@ BEGIN
     IF (@emailExists = FALSE) THEN
 		CALL externalExists(external_id, @externalExists);
 		IF (@externalExists = FALSE) THEN
-			INSERT INTO `user`(`name`, photo, external_id, typeid, email, phonenumber, isadmin, `password`, locked, active)
+			IF (photo = NULL) THEN
+				SET photo = "default_photo.png";
+				INSERT INTO `user`(`name`, photo, external_id, typeid, email, phonenumber, isadmin, `password`, locked, active)
 				VALUES (`name`, photo, external_id, typeid, email, phonenumber, 0, MD5(pass), 0, 0);
+			END IF;
 		END IF;
 	END IF;
 END$$
@@ -218,6 +225,40 @@ BEGIN
     IF (@isAdmin = TRUE) THEN
 		UPDATE `user` u SET u.active = 1;
 	END IF;
+END$$
+DELIMITER ;
+
+-- insertGrade --
+DROP PROCEDURE IF EXISTS insertGrade;
+DELIMITER $$
+CREATE PROCEDURE insertGrade(IN userid INT, IN studentid INT, IN groupDesc VARCHAR(255), IN grade TINYINT, OUT state BOOL)
+BEGIN
+	SET state = FALSE;
+    SET @groupid = (SELECT g.id FROM `group` g WHERE g.`desc` LIKE groupDesc);
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		CALL isInGroup(studentid, @groupid, @isInGroup);
+		IF (@isInGroup = TRUE) THEN
+			IF (grade BETWEEN 0 AND 20) THEN
+				UPDATE groupuser gu SET gu.grade = grade WHERE gu.groupid = @groupid AND gu.userid = studentid;
+				SET state = TRUE;
+			END IF;
+		END IF;
+	END IF;
+END$$
+DELIMITER ;
+
+-- isFinished --
+DROP PROCEDURE IF EXISTS isFinished;
+DELIMITER $$
+CREATE PROCEDURE isFinished(IN userid INT, IN desciption VARCHAR(255), OUT isFinished BOOL)
+BEGIN
+	SET isFinished = FALSE;
+    SET @groupid = (SELECT g.id FROM `group` g WHERE g.`desc` LIKE groupDesc);
+    CALL isAdmin(userid, @isAdmin);
+    IF (@isAdmin = TRUE) THEN
+		SET isFinished = (SELECT NOT EXISTS(SELECT * FROM groupuser gu WHERE gu.groupid = @groupid AND grade IS NULL));
+    END IF;    
 END$$
 DELIMITER ;
 
