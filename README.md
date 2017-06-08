@@ -1,7 +1,7 @@
-Projectary - Database Documentation
+Projectary - Database
 ===================
 
-The documentation of this page is included in the documentation folder named Documentation. 
+The documentation of the database is located [here](Documentation/Home.md).
 There are many files of extencion .md used for documentation with markup.
 
 
